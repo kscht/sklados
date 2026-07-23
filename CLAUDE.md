@@ -80,7 +80,7 @@ domovoy/
 - [x] Полная схема данных в `docs/database.md`
 - [x] Docker Compose: dev + prod + test
 - [x] Makefile с командами
-- [x] `scripts/seed.surql` — 2161 оператор, все 27 типов рёбер
+- [x] `scripts/seed.surql` — 2538 стейтментов, все 27 типов рёбер; **мигрирован на канон 41 kind** (фаза 1): ASCII-слаги + `legacy_kind`, статусы-слаги, SKOS-словари в начале файла
 - [x] Surrealist GUI контейнер (`docker/surrealist/`, profile: tools) — см. проблему ниже
 - [ ] `web/` — инициализировать Next.js проект
 - [ ] `worker-scheduler/` — минимальный воркер
@@ -90,7 +90,8 @@ domovoy/
 
 ## Тестовый датасет
 
-`scripts/seed.surql` — готов. Залить: `make seed`.
+`scripts/seed.surql` — готов, мигрирован (фаза 1). Залить: `make seed`.
+`scripts/generate_seed.py` — ⚠️ ещё генерирует старый формат (56 кириллических kind); обновить отдельным коммитом перед следующей регенерацией.
 
 Медиафикстуры (пока не залиты):
 - Источник изображений: `~/cursor/yascrap/yaplakal-scraper/data/*.jpg`
