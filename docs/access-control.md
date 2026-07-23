@@ -79,7 +79,7 @@ graph TD
 
 ```surql
 DEFINE ACCESS account ON DATABASE TYPE RECORD
-  SIGNUP ( CREATE thing SET kind = 'человек', email = $email,
+  SIGNUP ( CREATE thing SET kind = 'person', email = $email,
            pass = crypto::argon2::generate($pass) )
   SIGNIN ( SELECT * FROM thing WHERE email = $email
            AND crypto::argon2::compare(pass, $pass) )

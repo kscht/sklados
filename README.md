@@ -127,13 +127,25 @@ Prometheus  (метрики и телеметрия, опционально)
 
 ```
 domovoy/
-├── docs/
-│   ├── database.md    — полная схема, сценарии, SurrealQL-запросы (~9300 строк)
-│   └── comparison.md  — сравнение с существующими решениями
-└── ...                — реализация (в разработке)
+├── docs/                    — документация (см. docs/README.md — индекс и порядок чтения)
+│   ├── database.md          — полная схема, сценарии, SurrealQL-запросы (~10 000 строк)
+│   ├── comparison.md        — сравнение с существующими решениями
+│   ├── kind-audit.md        — канон kind, иерархия категорий, SKOS-словари
+│   ├── relation-typing.md   — типизация связей
+│   ├── access-control.md    — модель доступа
+│   ├── ui-architecture.md   — UI как данные
+│   ├── categorization.md    — категоризация как процесс
+│   ├── roadmap-inventory.md — роадмап первой вертикали
+│   ├── decisions.md         — реестр решений и открытых вопросов
+│   └── docs-audit.md        — ревизия документации
+├── web/                     — Next.js (в разработке)
+├── worker-*/                — воркеры TS/Python (в разработке)
+└── scripts/                 — seed, генераторы, бэкап
 ```
 
 ## Документация
+
+Индекс, статусы документов и порядок чтения — [`docs/README.md`](docs/README.md).
 
 - [`docs/database.md`](docs/database.md) — вся схема данных, диаграммы Mermaid, примеры SurrealQL
 - [`docs/comparison.md`](docs/comparison.md) — сравнение с Notion, n8n, NetBox, Obsidian и другими
@@ -143,3 +155,5 @@ domovoy/
 - [`docs/ui-architecture.md`](docs/ui-architecture.md) — UI как данные: универсальный движок на виджетах с контрактами и декларативной композицией из каталога
 - [`docs/roadmap-inventory.md`](docs/roadmap-inventory.md) — роадмап первой вертикали (инвентарь + места хранения): 10 фаз × 1–3 дня, прокатывает всю архитектуру
 - [`docs/categorization.md`](docs/categorization.md) — как происходит категоризация: 6 моментов × 5 источников × 3 роли; стартуем с пустого каталога, дерево вырастает из кликов
+- [`docs/decisions.md`](docs/decisions.md) — реестр всех решений и открытых вопросов (блокеры фазы 1 — там же)
+- [`docs/docs-audit.md`](docs/docs-audit.md) — ревизия документации: два поколения архитектуры, противоречия, план приведения к канону

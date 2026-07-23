@@ -550,6 +550,8 @@ RELATE thing:`family_main`->participant->thing:`contact_mechanic_igor`
 
 ## Открытые вопросы
 
+> Сведены в [`decisions.md`](decisions.md) как D-01…D-09 — актуальные статусы и рекомендации там.
+
 1. **`server` и `service`** — `server` → `device` с `role='server'` (рекомендация: схлопнуть).
 
 2. **`book`** — `item` (как сейчас) или собственный `kind`? Тест: нет эксклюзивных рёбер, нет отдельного state machine. **Вердикт: `item` + `category='book'`**. Содержимое книги, если появится — отдельный `document` + `represents` к item-книге.
