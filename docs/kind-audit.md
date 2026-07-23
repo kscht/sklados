@@ -512,7 +512,7 @@ RELATE thing:`family_main`->participant->thing:`contact_mechanic_igor`
 
 ## Что не входит в этот аудит
 
-- `kind`-значения, упоминаемые только в `docs/database.md` (нет узлов в seed): `server`, `service`, `incident`, `event`, `chat`, `question`, `attempt`, `template`, `tag` — добавим при расширениях.
+- `kind`-значения, упоминаемые только в `docs/database.md` (нет узлов в seed): ~~`server`, `service`, `incident`, `event`, `chat`, `question`, `attempt`, `template`, `tag` — добавим при расширениях~~. **Поправка:** полный инвентарь database.md — 118 значений; строгий тест по ним прогнан в [`kind-audit-domains.md`](kind-audit-domains.md) → канон 27 → ~40.
 - Поле `status` — отдельная миграция, после `kind`; станет `vocab:domovoy_status`.
 - Bulk-импорт внешних словарей — лениво, по факту использования.
 
