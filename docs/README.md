@@ -7,8 +7,8 @@
 | # | Документ | Поколение | Статус | Что это |
 |---|---|---|---|---|
 | 1 | [`kind-audit.md`](kind-audit.md) | 2 — канон | 🟢 | тест на `kind`, канон 27, иерархия категорий, SKOS-словари, план миграции seed |
-| 1а | [`kind-audit-domains.md`](kind-audit-domains.md) | 2 — канон | 🟢 предложение | прогон теста по 118 `kind` из database.md → канон 27 → ~40 (ждёт утверждения, D-31) |
-| 1б | [`status-audit.md`](status-audit.md) | 2 — канон | 🟢 предложение | канонизация статусов: ~60 → ~45 слагов в 16 под-схемах (ждёт утверждения, D-32) |
+| 1а | [`kind-audit-domains.md`](kind-audit-domains.md) | 2 — канон | 🟢 утверждён | прогон теста по 118 `kind` из database.md → канон 27 → **41** (D-31, D-37) |
+| 1б | [`status-audit.md`](status-audit.md) | 2 — канон | 🟢 утверждён | канонизация статусов: ~60 → ~45 слагов в 16 под-схемах (D-32) |
 | 2 | [`relation-typing.md`](relation-typing.md) | 2 — канон | 🟡 требует переписывания под SKOS | типизация связей: каталог рёбер, gradual typing (`enforce`) |
 | 3 | [`access-control.md`](access-control.md) | 2 — канон | 🟢 | модель доступа: `can_access` как данные + обобщённый `PERMISSIONS WHERE` |
 | 4 | [`ui-architecture.md`](ui-architecture.md) | 2 — канон | 🟢 | UI как данные: декларация `ui` на концепте + ~30 виджетов |
