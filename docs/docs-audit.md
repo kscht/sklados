@@ -1,6 +1,8 @@
 # Ревизия документации — два поколения архитектуры
 
-Полная ревизия корпуса документации (8 документов, 12 419 строк, + README + CLAUDE.md) на согласованность между собой и с планом фазы 1. Дата ревизии: 2026-07-23.
+Полная ревизия корпуса документации (8 документов, 12 419 строк, + README + CLAUDE.md) на согласованность между собой и с планом фазы 1. Дата ревизии: 2026-07-21.
+
+> **Снимок на дату ревизии.** Актуальные статусы — [`README.md`](README.md) и [`decisions.md`](decisions.md): блокеры №1–5 закрыты (канон 41, статусы, категории, UI, рёбра), `relation-typing.md` переписан под SKOS, seed мигрирован (фаза 1).
 
 Связанные документы: [`kind-audit.md`](kind-audit.md) (канон `kind`), [`relation-typing.md`](relation-typing.md), [`ui-architecture.md`](ui-architecture.md), [`categorization.md`](categorization.md), [`roadmap-inventory.md`](roadmap-inventory.md), [`access-control.md`](access-control.md), [`database.md`](database.md).
 

@@ -2833,3 +2833,26 @@ RELATE thing:`tomato_bed_3`->located_at->thing:`dacha_garden`;
 CREATE thing:`event_vet_murka` SET kind = 'event', subtype = 'appointment', name = 'Приём у ветеринара — Мурка', status = 'planned', date = '2026-08-05', created_at = time::now();
 RELATE thing:`event_vet_murka`->about->thing:`pet_murka`;
 RELATE thing:`event_vet_murka`->participant->thing:`user_mama` SET role = 'сопровождающий';
+-- ═══ Мета-классы субъектов и стартовая типизация рёбер (D-43) ══════════════
+-- Классы — концепты-группировки в vocab:domovoy_kind (is_class=true), НЕ значения kind.
+-- from_kinds/to_kinds на концептах рёбер: слаги kind или классов; NONE = любой.
+-- Все enforce=false (soft): машинерия fn::check_edge появится с воркерами.
+CREATE thing:`class_party` SET kind = 'concept', identifier = 'party', is_class = true, _i18n = { ru: { label: 'Социальный субъект' }, en: { label: 'Party' } }, created_at = time::now();
+RELATE thing:`class_party`->part_of->thing:`vocab_domovoy_kind`;
+CREATE thing:`class_actor` SET kind = 'concept', identifier = 'actor', is_class = true, _i18n = { ru: { label: 'Исполнитель' }, en: { label: 'Actor' } }, created_at = time::now();
+RELATE thing:`class_actor`->part_of->thing:`vocab_domovoy_kind`;
+RELATE thing:`class_party`->part_of->thing:`class_actor`;
+RELATE thing:`kind_person`->part_of->thing:`class_party`;
+RELATE thing:`kind_group`->part_of->thing:`class_party`;
+RELATE thing:`kind_org`->part_of->thing:`class_party`;
+RELATE thing:`kind_agent`->part_of->thing:`class_actor`;
+RELATE thing:`kind_worker`->part_of->thing:`class_actor`;
+RELATE thing:`kind_gateway`->part_of->thing:`class_actor`;
+UPDATE thing:`edge_lent_to` SET from_kinds = ['item','device'], to_kinds = ['party'], cardinality = 'many-to-one', enforce = false;
+UPDATE thing:`edge_borrowed_from` SET from_kinds = ['item','device'], to_kinds = ['party'], cardinality = 'many-to-one', enforce = false;
+UPDATE thing:`edge_promised_to` SET from_kinds = ['task'], to_kinds = ['party'], cardinality = 'many-to-many', enforce = false;
+UPDATE thing:`edge_assigned_to` SET from_kinds = NONE, to_kinds = ['actor'], cardinality = 'many-to-one', enforce = false;
+UPDATE thing:`edge_participant` SET from_kinds = NONE, to_kinds = ['party'], cardinality = 'many-to-many', enforce = false;
+UPDATE thing:`edge_expert_in` SET from_kinds = ['person','org'], to_kinds = NONE, cardinality = 'many-to-many', enforce = false;
+UPDATE thing:`edge_filed_with` SET from_kinds = ['appeal'], to_kinds = ['org'], cardinality = 'many-to-one', enforce = false;
+UPDATE thing:`edge_can_access` SET from_kinds = NONE, to_kinds = NONE, cardinality = 'many-to-many', enforce = false;

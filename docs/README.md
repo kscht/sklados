@@ -9,7 +9,7 @@
 | 1 | [`kind-audit.md`](kind-audit.md) | 2 — канон | 🟢 | тест на `kind`, канон 27, иерархия категорий, SKOS-словари, план миграции seed |
 | 1а | [`kind-audit-domains.md`](kind-audit-domains.md) | 2 — канон | 🟢 утверждён | прогон теста по 118 `kind` из database.md → канон 27 → **41** (D-31, D-37) |
 | 1б | [`status-audit.md`](status-audit.md) | 2 — канон | 🟢 утверждён | канонизация статусов: ~60 → ~45 слагов в 16 под-схемах (D-32) |
-| 2 | [`relation-typing.md`](relation-typing.md) | 2 — канон | 🟡 требует переписывания под SKOS | типизация связей: каталог рёбер, gradual typing (`enforce`) |
+| 2 | [`relation-typing.md`](relation-typing.md) | 2 — канон | 🟢 переписан под SKOS | типизация связей: поля на концептах `vocab:domovoy_edge`, классы `party`/`actor`, gradual typing (`enforce`) |
 | 3 | [`access-control.md`](access-control.md) | 2 — канон | 🟢 | модель доступа: `can_access` как данные + обобщённый `PERMISSIONS WHERE` |
 | 4 | [`ui-architecture.md`](ui-architecture.md) | 2 — канон | 🟢 | UI как данные: декларация `ui` на концепте + ~30 виджетов |
 | 5 | [`categorization.md`](categorization.md) | 2 — канон | 🟢 | категоризация как процесс: моменты, источники, роли, inbox |
@@ -23,6 +23,6 @@
 
 1. **Канон `kind`** — `kind-audit.md`. Кириллические `kind` в `database.md` — историческая нотация, не копировать в код.
 2. **UI-модель** — `ui-architecture.md`. Разделы «UI-слой» и «Дашборды, виджеты и отчёты» в `database.md` — предшествующий слой (см. decisions.md, D-34).
-3. **Каталог рёбер** — SKOS (`vocab:domovoy_edge`); конструкция `kind='тип-связи'` из `relation-typing.md` подлежит переводу на SKOS (D-35).
+3. **Каталог рёбер** — SKOS (`vocab:domovoy_edge`), типизация — поля на концептах рёбер; субъектные концы — через классы `party`/`actor` (D-35, D-43 — выполнены).
 4. **Новые открытые вопросы** заводить в `decisions.md`, а не в конце тематических доков.
 5. `database.md` **не переписываем целиком** — разделы приводятся к канону по мере реализации доменов.
