@@ -2856,3 +2856,37 @@ UPDATE thing:`edge_participant` SET from_kinds = NONE, to_kinds = ['party'], car
 UPDATE thing:`edge_expert_in` SET from_kinds = ['person','org'], to_kinds = NONE, cardinality = 'many-to-many', enforce = false;
 UPDATE thing:`edge_filed_with` SET from_kinds = ['appeal'], to_kinds = ['org'], cardinality = 'many-to-one', enforce = false;
 UPDATE thing:`edge_can_access` SET from_kinds = NONE, to_kinds = NONE, cardinality = 'many-to-many', enforce = false;
+
+-- ═══ Класс container + типизация contains (D-51, D-52) ═════════════════════
+CREATE thing:`class_container` SET kind = 'concept', identifier = 'container', is_class = true, _i18n = { ru: { label: 'Может содержать' }, en: { label: 'Container' } }, created_at = time::now();
+RELATE thing:`class_container`->part_of->thing:`vocab_domovoy_kind`;
+RELATE thing:`kind_location`->part_of->thing:`class_container`;
+RELATE thing:`kind_item`->part_of->thing:`class_container`;
+RELATE thing:`kind_device`->part_of->thing:`class_container`;
+UPDATE thing:`edge_contains` SET from_kinds = ['container'], to_kinds = NONE, cardinality = 'one-to-many', enforce = false;
+
+-- ═══ Системные view: workspace «Склад» (D-50) ══════════════════════════════
+CREATE thing:`view_inbox` SET kind = 'view', subtype = 'smart_list', slug = 'inbox', query = "SELECT * FROM thing WHERE kind = 'item' AND category = NONE", group_by = 'legacy_kind', bulk = true, _i18n = { ru: { label: 'Без категории' }, en: { label: 'Uncategorized' } }, created_at = time::now();
+CREATE thing:`view_items_all` SET kind = 'view', subtype = 'smart_list', slug = 'items', query = "SELECT * FROM thing WHERE kind = 'item'", columns = ['Title', 'CategoryChip', 'LocationCrumb'], _i18n = { ru: { label: 'Все вещи' }, en: { label: 'All items' } }, created_at = time::now();
+CREATE thing:`view_storage_tree` SET kind = 'view', subtype = 'tree', slug = 'storage', component = 'LocationTree', _i18n = { ru: { label: 'Дерево хранения' }, en: { label: 'Storage tree' } }, created_at = time::now();
+CREATE thing:`view_lent` SET kind = 'view', subtype = 'smart_list', slug = 'lent', query = "SELECT in AS item, out AS holder, since FROM lent_to", columns = ['Title', 'LentToCard', 'SinceAge'], _i18n = { ru: { label: 'Одолжено' }, en: { label: 'Lent out' } }, created_at = time::now();
+CREATE thing:`ws_sklad` SET kind = 'view', subtype = 'workspace', slug = 'sklad', icon = 'warehouse', sidebar = [thing:`view_inbox`, thing:`view_items_all`, thing:`view_storage_tree`, thing:`view_lent`], home = thing:`view_storage_tree`, _i18n = { ru: { label: 'Склад' }, en: { label: 'Storage' } }, created_at = time::now();
+
+-- ═══ Живые примеры дуальности контейнеров (D-51, D-52) ═════════════════════
+-- Холодильник = item-контейнер: вещь (бренд, гарантия) И место хранения
+CREATE thing:`fridge_kitchen` SET kind = 'item', name = 'Холодильник Bosch KGN39', brand = 'bosch', model = 'KGN39', created_at = time::now();
+RELATE thing:`apt_kitchen`->contains->thing:`fridge_kitchen` SET since = time::now();
+RELATE thing:`гарантийный_талон_холодильник`->about->thing:`fridge_kitchen`;
+CREATE thing:`fridge_garage` SET kind = 'item', name = 'Холодильник старый (гараж)', created_at = time::now();
+RELATE thing:`garage`->contains->thing:`fridge_garage` SET since = time::now();
+CREATE thing:`food_milk` SET kind = 'item', name = 'Молоко 3.2% (2 пакета)', quantity = 2, unit = 'шт', expires_at = '2026-07-28', created_at = time::now();
+RELATE thing:`fridge_kitchen`->contains->thing:`food_milk` SET since = time::now();
+CREATE thing:`food_pelmeni` SET kind = 'item', name = 'Пельмени домашние (заморозка)', quantity = 1, unit = 'кг', expires_at = '2026-10-01', created_at = time::now();
+RELATE thing:`fridge_kitchen`->contains->thing:`food_pelmeni` SET since = time::now();
+CREATE thing:`food_pickles` SET kind = 'item', name = 'Соленья дачные (банки)', quantity = 6, unit = 'шт', created_at = time::now();
+RELATE thing:`fridge_garage`->contains->thing:`food_pickles` SET since = time::now();
+-- Device = контейнер комплектующих: contains {installed: true}
+CREATE thing:`ssd_512gb_nuc` SET kind = 'item', name = 'SSD 512GB NVMe (в NUC)', created_at = time::now();
+RELATE thing:`nuc_intel_i5_mini_pc`->contains->thing:`ssd_512gb_nuc` SET installed = true, since = time::now();
+CREATE thing:`ram_16gb_nuc` SET kind = 'item', name = 'RAM 16GB DDR4 SO-DIMM (в NUC)', created_at = time::now();
+RELATE thing:`nuc_intel_i5_mini_pc`->contains->thing:`ram_16gb_nuc` SET installed = true, since = time::now();
