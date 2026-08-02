@@ -7,7 +7,7 @@ import { cell, i18nLabel, type ThingRow } from "@/lib/format";
 const ROW_LIMIT = 300;
 
 function pickColumns(rows: ThingRow[]): string[] {
-  const preferred = ["name", "item", "holder", "legacy_kind", "category", "status", "quantity", "since", "expires_at"];
+  const preferred = ["name", "item", "holder", "category", "status", "quantity", "since", "expires_at"];
   const present = new Set(rows.flatMap((r) => Object.keys(r)));
   const cols = preferred.filter((c) => present.has(c));
   return cols.length ? cols : [...present].filter((c) => !c.startsWith("_") && c !== "id").slice(0, 6);

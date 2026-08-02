@@ -47,7 +47,7 @@ export default async function Things({
           <tr className="border-b border-neutral-200 text-left text-neutral-500">
             <th className="py-2 pr-4 font-medium">name</th>
             <th className="py-2 pr-4 font-medium">kind</th>
-            <th className="py-2 pr-4 font-medium">legacy_kind</th>
+            <th className="py-2 pr-4 font-medium">category</th>
             <th className="py-2 pr-4 font-medium">status</th>
           </tr>
         </thead>
@@ -56,7 +56,7 @@ export default async function Things({
             <tr key={(r.id as string) ?? i} className="border-b border-neutral-100 hover:bg-neutral-50">
               <td className="py-1.5 pr-4">{cell(r.name)}</td>
               <td className="py-1.5 pr-4 text-neutral-500">{cell(r.kind)}</td>
-              <td className="py-1.5 pr-4 text-neutral-400">{cell(r.legacy_kind)}</td>
+              <td className="py-1.5 pr-4 text-neutral-400">{cell(r.category)}</td>
               <td className="py-1.5 pr-4">{cell(r.status)}</td>
             </tr>
           ))}

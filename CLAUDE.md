@@ -80,7 +80,7 @@ domovoy/
 - [x] Полная схема данных в `docs/database.md`
 - [x] Docker Compose: dev + prod + test
 - [x] Makefile с командами
-- [x] `scripts/seed.surql` — 2538 стейтментов, все 27 типов рёбер; **мигрирован на канон 41 kind** (фаза 1): ASCII-слаги + `legacy_kind`, статусы-слаги, SKOS-словари в начале файла
+- [x] `scripts/seed.surql` — **мигрирован на канон 41 kind** (фаза 1): ASCII-слаги, статусы-слаги, SKOS-словари в начале файла; категории проставлены из таблицы миграции, словарь ~45 концептов с иерархией (`legacy_kind` удалён — D-33 пересмотрен)
 - [x] Surrealist GUI контейнер (`docker/surrealist/`, profile: tools) — см. проблему ниже
 - [x] `web/` — Next.js 15 инициализирован (фаза 2 v1): маршрут `/w/[slug]` рендерит workspace-узлы из графа, generic-фолбэк `/things`; деплой на VM, снаружи — https://v1.spiridus.ru/w/sklad
 - [ ] `worker-scheduler/` — минимальный воркер
