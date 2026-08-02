@@ -91,9 +91,9 @@
 
 Все метки (kind, категории, статусы, виджеты) — из `_i18n` концептов; они **уже в данных** с фазы 1. Ru/en-переключатель в шапке; контент (`name`) остаётся на языке оригинала. **DoD:** «Холодильники» ↔ «Refrigerators», имя вещи не переводится.
 
-## Этап F — Права и логин (≈ 2–3 дня, фаза 8 роадмапа)
+## Этап F — Права и вход через Keycloak (≈ 2–3 дня, фаза 8 роадмапа, D-11)
 
-`DEFINE ACCESS RECORD` + обобщённый `PERMISSIONS WHERE` по [`access-control.md`](access-control.md); логин; `<AccessGrantsWidget>` + модалка «поделиться»; root-доступ web выключается. **DoD:** сын видит только игрушки; папа поделился полкой — мама сразу её видит.
+Своего логина **нет** — вход через Keycloak (OIDC): Auth.js с Keycloak-провайдером в web; `DEFINE ACCESS TYPE JWT` (JWKS realm'а) + `AUTHENTICATE`-маппинг claim → узел `person` (JIT-провижининг при первом входе); обобщённый `PERMISSIONS WHERE` по [`access-control.md`](access-control.md) — без изменений; `<AccessGrantsWidget>` + модалка «поделиться»; root-доступ web выключается. **DoD:** редирект на Keycloak → сессия; сын видит только игрушки; папа поделился полкой — мама сразу её видит.
 
 ## Этап G — Actions v1 + lent-workflow (≈ 1–2 дня, фаза 9)
 

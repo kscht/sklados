@@ -62,7 +62,7 @@
 | ID | Вопрос | Рекомендация | Статус |
 |---|---|---|---|
 | D-10 | Домен для веб-каркаса (dev/prod) | `localhost:3000` dev; prod — при деплое | отложен |
-| D-11 | Auth-стратегия фазы 8 — email+password или OIDC | email+password на старте | рек. |
+| D-11 | Auth-стратегия фазы 8 — email+password или OIDC | **Keycloak (OIDC)**: своего логина/паролей/signup нет; web — Auth.js с Keycloak-провайдером; SurrealDB — `DEFINE ACCESS TYPE JWT` (JWKS realm'а) + `AUTHENTICATE` маппит claim `sub`/`email` → узел `person` (JIT-провижининг при первом входе). `PERMISSIONS WHERE`/`can_access` не меняются | ✅ решён (2026-08-02) |
 | D-12 | Граф-визуализация в UI приложения — в этой вертикали или позже? | позже; для админ-задач достаточно Surrealist ≥3.2 Graph view | рек. |
 
 ## UI (из ui-architecture.md)

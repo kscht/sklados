@@ -45,8 +45,8 @@ graph TD
 | Примитив SurrealDB | Используем для | Частота |
 |--------------------|----------------|---------|
 | ROOT-пользователь | миграции, `DEFINE` схемы, бэкап / restore | только админ |
-| `ACCESS TYPE RECORD` | все люди и сервис-аккаунты → `$auth` | 99% трафика |
-| `ACCESS TYPE JWT` | внешний IdP (OIDC / SAML) | опц. |
+| `ACCESS TYPE JWT` | Keycloak (OIDC) → `$auth` через `AUTHENTICATE` (D-11) | 99% трафика |
+| `ACCESS TYPE RECORD` | email+password без внешнего IdP | не используется (справочно) |
 | `ACCESS TYPE BEARER` | отзываемые API-ключи (PAM) | опц. |
 | `PERMISSIONS` на таблицах / полях | единственная точка enforcement | всегда |
 | NS / DB-юзеры с `OWNER/EDITOR/VIEWER` | почти не используем — обходят PERMISSIONS | редко (напр. `VIEWER` для read-only метрик) |
@@ -75,7 +75,26 @@ graph TD
 
 ## Конкретный enforcement
 
-### Аутентификация: record-access
+### Аутентификация: Keycloak (OIDC) через JWT-access (D-11)
+
+Собственных паролей и SIGNUP нет — identity живёт в Keycloak. SurrealDB валидирует его JWT по JWKS и маппит на узел `person`:
+
+```surql
+DEFINE ACCESS keycloak ON DATABASE TYPE JWT
+  URL 'https://<keycloak>/realms/<realm>/protocol/openid-connect/certs'
+  AUTHENTICATE (
+    -- claim sub → узел person; JIT-провижининг при первом входе
+    LET $p = (SELECT * FROM thing WHERE kind = 'person' AND oidc_sub = $token.sub)[0];
+    RETURN $p ?? (CREATE thing SET kind = 'person',
+                  oidc_sub = $token.sub, email = $token.email,
+                  name = $token.name ?? $token.email);
+  )
+  DURATION FOR SESSION 12h;
+```
+
+После аутентификации `$auth` = запись человека — всё дальнейшее (PERMISSIONS, `can_access`) не отличается от record-варианта.
+
+<details><summary>Альтернатива без внешнего IdP: record-access (email+password) — не используется, для справки</summary>
 
 ```surql
 DEFINE ACCESS account ON DATABASE TYPE RECORD
@@ -86,7 +105,7 @@ DEFINE ACCESS account ON DATABASE TYPE RECORD
   DURATION FOR TOKEN 15m, FOR SESSION 12h;
 ```
 
-После `SIGNIN` `$auth` = запись человека / сервис-аккаунта.
+</details>
 
 ### Авторизация: PERMISSIONS на thing
 
