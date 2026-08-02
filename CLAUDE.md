@@ -82,7 +82,7 @@ domovoy/
 - [x] Makefile с командами
 - [x] `scripts/seed.surql` — 2538 стейтментов, все 27 типов рёбер; **мигрирован на канон 41 kind** (фаза 1): ASCII-слаги + `legacy_kind`, статусы-слаги, SKOS-словари в начале файла
 - [x] Surrealist GUI контейнер (`docker/surrealist/`, profile: tools) — см. проблему ниже
-- [ ] `web/` — инициализировать Next.js проект
+- [x] `web/` — Next.js 15 инициализирован (фаза 2 v1): маршрут `/w/[slug]` рендерит workspace-узлы из графа, generic-фолбэк `/things`; деплой на VM, снаружи — https://v1.spiridus.ru/w/sklad
 - [ ] `worker-scheduler/` — минимальный воркер
 - [ ] DEFINE-схема в SurrealDB (из database.md выжать в .surql файл)
 - [ ] UI-спайки (спайк A: thing list + detail, спайк B: граф-визуализация)
