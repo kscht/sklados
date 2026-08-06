@@ -3023,3 +3023,20 @@ UPDATE thing:`kind_person` SET ui = {
   body:   ['Description', 'GenericFields'],
   footer: ['Timestamps']
 };
+
+-- ═══ Рабочий стол (этап A2, D-53/D-54): корневой desktop + размещения ══════
+CREATE thing:`desktop_home` SET kind = 'view', subtype = 'desktop', slug = 'home', name = 'Домовой', _i18n = { ru: { label: 'Домовой' }, en: { label: 'Home' } }, created_at = time::now();
+CREATE thing:`folder_tech` SET kind = 'view', subtype = 'desktop', slug = 'tech', icon = '🖥', name = 'Техника', _i18n = { ru: { label: 'Техника' }, en: { label: 'Tech' } }, created_at = time::now();
+RELATE thing:`desktop_home`->references->thing:`apt` SET order = 1;
+RELATE thing:`desktop_home`->references->thing:`garage` SET order = 2;
+RELATE thing:`desktop_home`->references->thing:`storage` SET order = 3;
+RELATE thing:`desktop_home`->references->thing:`dacha` SET order = 4;
+RELATE thing:`desktop_home`->references->thing:`folder_tech` SET order = 5;
+RELATE thing:`desktop_home`->references->thing:`view_items_all` SET order = 6;
+RELATE thing:`desktop_home`->references->thing:`view_lent` SET order = 7;
+RELATE thing:`desktop_home`->references->thing:`fridge_kitchen` SET order = 8;   -- симлинк: он же в Кухне
+RELATE thing:`desktop_home`->references->thing:`pet_murka` SET order = 9;
+RELATE thing:`folder_tech`->references->thing:`nuc_intel_i5_mini_pc` SET order = 1;
+RELATE thing:`folder_tech`->references->thing:`роутер_tp_link_ax3000` SET order = 2;
+RELATE thing:`folder_tech`->references->thing:`ноутбук_thinkpad_t14s` SET order = 3;
+RELATE thing:`folder_tech`->references->thing:`kindle_paperwhite_11` SET order = 4;

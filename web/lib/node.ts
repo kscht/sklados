@@ -5,16 +5,34 @@ import type { ThingRow } from "@/lib/format";
 // словарей (kind ui, категория, статус). Фрагменты соответствуют контрактам
 // виджетов из реестра; v1 включает все фрагменты (13 виджетов — дёшево).
 
+export type GridChild = {
+  id: string; name?: string; kind?: string; subtype?: string;
+  icon?: string; category?: string; label?: string; installed?: boolean;
+};
+
 export type NodeBundle = ThingRow & {
   _kind_ui?: Record<string, string[]>;
   _kind_label?: string;
   _status_meta?: { color?: string; label?: string };
   _cat_label?: string;
   _located_in?: { id: string; name: string }[];
-  _contains?: { installed?: boolean; id: string; name: string; kind: string; category?: string }[];
+  _contains?: (GridChild & { installed?: boolean })[];
   _lent?: { since?: string; id: string; name: string }[];
   _docs?: { id: string; name: string }[];
+  _placed?: GridChild[];
+  _sub_locations?: GridChild[];
 };
+
+// дети узла для грида: размещения (references) + под-локации + содержимое
+export function gridChildren(n: NodeBundle): GridChild[] {
+  const seen = new Set<string>();
+  const out: GridChild[] = [];
+  for (const c of [...(n._placed ?? []), ...(n._sub_locations ?? []), ...(n._contains ?? [])]) {
+    const k = String(c.id);
+    if (!seen.has(k)) { seen.add(k); out.push(c); }
+  }
+  return out;
+}
 
 // raw id без префикса "thing:" и обрамления ⟨⟩ / `` (SurrealDB отдаёт оба варианта)
 export function rawId(id: string): string {
@@ -38,7 +56,9 @@ SELECT *,
  (SELECT installed, out.id AS id, out.name AS name, out.kind AS kind, out.category AS category FROM contains WHERE in = $parent.id LIMIT 100) AS _contains,
  (SELECT since, out.id AS id, out.name AS name FROM lent_to WHERE in = $parent.id) AS _lent,
  (SELECT in.id AS id, in.name AS name FROM represents WHERE out = $parent.id) AS _docs_r,
- (SELECT in.id AS id, in.name AS name FROM about WHERE out = $parent.id AND in.kind = 'document') AS _docs_a
+ (SELECT in.id AS id, in.name AS name FROM about WHERE out = $parent.id AND in.kind = 'document') AS _docs_a,
+ (SELECT order, out.id AS id, out.name AS name, out.kind AS kind, out.subtype AS subtype, out.icon AS icon, out.category AS category, out._i18n.ru.label AS label FROM references WHERE in = $parent.id ORDER BY order LIMIT 200) AS _placed,
+ (SELECT in.id AS id, in.name AS name, in.kind AS kind, in.icon AS icon FROM part_of WHERE out = $parent.id AND in.kind = 'location' LIMIT 200) AS _sub_locations
 FROM ONLY type::record('thing:⟨${r}⟩') LIMIT 1;`;
   const node = await sql<NodeBundle | null>(q);
   if (!node || typeof node !== "object") return null;
