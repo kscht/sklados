@@ -2,10 +2,10 @@
 
 export type ThingRow = Record<string, unknown>;
 
-// "thing:⟨дрель_шуруповёрт⟩" | "thing:apt" → "дрель_шуруповёрт" | "apt"
+// "thing:⟨дрель⟩" | "thing:`дрель`" | "thing:apt" → голый слаг
 export function recordLabel(v: unknown): string {
   if (typeof v !== "string") return String(v ?? "");
-  const m = v.match(/^([a-z_]+):⟨?(.+?)⟩?$/u);
+  const m = v.match(/^([a-z_]+):[⟨`]?(.+?)[⟩`]?$/u);
   return m ? m[2] : v;
 }
 

@@ -3001,3 +3001,25 @@ CREATE thing:`ssd_512gb_nuc` SET kind = 'item', name = 'SSD 512GB NVMe (в NUC)'
 RELATE thing:`nuc_intel_i5_mini_pc`->contains->thing:`ssd_512gb_nuc` SET installed = true, since = time::now();
 CREATE thing:`ram_16gb_nuc` SET kind = 'item', name = 'RAM 16GB DDR4 SO-DIMM (в NUC)', category = 'electronics', created_at = time::now();
 RELATE thing:`nuc_intel_i5_mini_pc`->contains->thing:`ram_16gb_nuc` SET installed = true, since = time::now();
+
+-- ═══ UI-декларации на концептах kind (этап A, D-44 ступень 3) ══════════════
+UPDATE thing:`kind_item` SET ui = {
+  header: ['Title', 'StatusChip', 'CategoryChip', 'BrandChip', 'QuantityDisplay'],
+  body:   ['Description', 'LocationCrumb', 'LentToCard', 'ContainedItems', 'RepresentsDocs', 'GenericFields'],
+  footer: ['WikidataLink', 'Timestamps']
+};
+UPDATE thing:`kind_device` SET ui = {
+  header: ['Title', 'RoleChip', 'StatusChip', 'CategoryChip', 'BrandChip'],
+  body:   ['Description', 'LocationCrumb', 'ContainedItems', 'RepresentsDocs', 'GenericFields'],
+  footer: ['WikidataLink', 'Timestamps']
+};
+UPDATE thing:`kind_location` SET ui = {
+  header: ['Title'],
+  body:   ['Description', 'LocationCrumb', 'ContainedItems', 'GenericFields'],
+  footer: ['Timestamps']
+};
+UPDATE thing:`kind_person` SET ui = {
+  header: ['Title', 'RoleChip'],
+  body:   ['Description', 'GenericFields'],
+  footer: ['Timestamps']
+};

@@ -1,5 +1,18 @@
+import Link from "next/link";
 import { sql } from "@/lib/db";
 import { cell, i18nLabel, type ThingRow } from "@/lib/format";
+import { nodeHref } from "@/components/widgets/registry";
+
+function Cell({ col, row }: { col: string; row: ThingRow }) {
+  const v = row[col];
+  if (col === "name" && row.id) {
+    return <Link href={nodeHref(row.id)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
+  }
+  if (typeof v === "string" && v.startsWith("thing:")) {
+    return <Link href={nodeHref(v)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
+  }
+  return <>{cell(v)}</>;
+}
 
 // v1-рендерер view-узлов: smart_list (+group_by), tree (упрощённый), фолбэк.
 // Полные виджеты по контрактам — фаза 3 (D-45).
@@ -30,7 +43,7 @@ function Table({ rows }: { rows: ThingRow[] }) {
           {rows.slice(0, ROW_LIMIT).map((r, i) => (
             <tr key={(r.id as string) ?? i} className="border-b border-neutral-100 hover:bg-neutral-50">
               {cols.map((c) => (
-                <td key={c} className="py-1.5 pr-4">{cell(r[c])}</td>
+                <td key={c} className="py-1.5 pr-4"><Cell col={c} row={r} /></td>
               ))}
             </tr>
           ))}
@@ -84,7 +97,7 @@ async function TreeView() {
       <div key={String(l.id)} style={{ marginLeft: depth * 16 }}>
         <div className="py-1 text-sm flex items-baseline gap-2">
           <span>{depth === 0 ? "🏠" : "▸"}</span>
-          <span>{l.name}</span>
+          <Link href={nodeHref(l.id)} className="hover:underline">{l.name}</Link>
           {l.items > 0 && <span className="text-xs text-neutral-400">{l.items} шт</span>}
         </div>
         {render(String(l.id), depth + 1)}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { sql } from "@/lib/db";
 import { cell, type ThingRow } from "@/lib/format";
+import { nodeHref } from "@/components/widgets/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,9 @@ export default async function Things({
         <tbody>
           {rows.map((r, i) => (
             <tr key={(r.id as string) ?? i} className="border-b border-neutral-100 hover:bg-neutral-50">
-              <td className="py-1.5 pr-4">{cell(r.name)}</td>
+              <td className="py-1.5 pr-4">
+                <Link href={nodeHref(r.id)} className="text-blue-700 hover:underline">{cell(r.name)}</Link>
+              </td>
               <td className="py-1.5 pr-4 text-neutral-500">{cell(r.kind)}</td>
               <td className="py-1.5 pr-4 text-neutral-400">{cell(r.category)}</td>
               <td className="py-1.5 pr-4">{cell(r.status)}</td>
