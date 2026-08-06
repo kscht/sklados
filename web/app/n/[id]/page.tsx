@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import NodeScreen from "@/components/NodeScreen";
-import { loadNode } from "@/lib/node";
+import Trail from "@/components/Trail";
+import { loadNode, rawId } from "@/lib/node";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +12,7 @@ export default async function NodePage({ params }: { params: Promise<{ id: strin
 
   return (
     <main className="mx-auto max-w-4xl p-6">
-      <nav className="mb-6 text-sm text-neutral-400">
-        <Link href="/" className="hover:underline">🏠 Домовой</Link>
-      </nav>
+      <Trail id={rawId(String(node.id))} name={String(node.name ?? rawId(String(node.id)))} />
       <NodeScreen node={node} />
     </main>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NodeScreen from "@/components/NodeScreen";
+import { TrailReset } from "@/components/Trail";
 import { loadNode } from "@/lib/node";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-4xl p-6">
+      <TrailReset />
       <NodeScreen node={desktop} />
       <p className="mt-12 text-xs text-neutral-300">
         <Link className="hover:underline" href="/things">generic-браузер</Link>
