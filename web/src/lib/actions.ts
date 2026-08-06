@@ -1,9 +1,7 @@
-"use server";
-
 import { sql } from "@/lib/db";
 import { rawId } from "@/lib/node";
 
-// Мутации графа для этапа A2 (root-доступ — до фазы F/Keycloak).
+// Мутации графа (клиент → /db-прокси; root до этапа F).
 // Размещение = ребро references (D-54); мутации не трогают сами узлы.
 
 function rec(id: string): string {
@@ -32,7 +30,6 @@ function freeSlotsFrom(start: number, taken: Set<number>): () => number {
   return () => { while (taken.has(s)) s++; taken.add(s); return s++; };
 }
 
-// симлинк: разместить узел ещё и в target (в первый свободный слот)
 export async function placeInto(targetId: string, nodeId: string): Promise<void> {
   const occ = await occupiedSlots(targetId);
   const next = freeSlotsFrom(1, new Set(occ.values()));
@@ -84,7 +81,6 @@ export async function createFolderFrom(
   return res.id;
 }
 
-// переместить выделение внутрь существующей папки
 export async function moveIntoFolder(
   folderId: string, containerId: string, nodeIds: string[],
 ): Promise<void> {

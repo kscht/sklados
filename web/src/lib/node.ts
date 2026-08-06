@@ -1,9 +1,7 @@
 import { sql } from "@/lib/db";
 import type { ThingRow } from "@/lib/format";
 
-// Загрузка узла для NodeCard: ОДИН SELECT (D-45) — узел + рёбра + метаданные
-// словарей (kind ui, категория, статус). Фрагменты соответствуют контрактам
-// виджетов из реестра; v1 включает все фрагменты (13 виджетов — дёшево).
+// Загрузка узла для экрана: ОДИН SELECT (D-45) — узел + рёбра + метаданные словарей.
 
 export type GridChild = {
   id: string; name?: string; kind?: string; subtype?: string;
@@ -24,7 +22,16 @@ export type NodeBundle = ThingRow & {
   _sub_locations?: GridChild[];
 };
 
-// дети узла для грида: размещения (references) + под-локации + содержимое
+// raw id без префикса "thing:" и обрамления ⟨⟩ / ``
+export function rawId(id: string): string {
+  return id.replace(/^thing:/, "").replace(/^[⟨`]/, "").replace(/[⟩`]$/, "");
+}
+
+function safeRaw(raw: string): string {
+  if (/['\\;⟨⟩`]/.test(raw) || raw.length > 200) throw new Error("bad node id");
+  return raw;
+}
+
 export function gridChildren(n: NodeBundle): GridChild[] {
   const seen = new Set<string>();
   const out: GridChild[] = [];
@@ -33,16 +40,6 @@ export function gridChildren(n: NodeBundle): GridChild[] {
     if (!seen.has(k)) { seen.add(k); out.push(c); }
   }
   return out;
-}
-
-// raw id без префикса "thing:" и обрамления ⟨⟩ / `` (SurrealDB отдаёт оба варианта)
-export function rawId(id: string): string {
-  return id.replace(/^thing:/, "").replace(/^[⟨`]/, "").replace(/[⟩`]$/, "");
-}
-
-function safeRaw(raw: string): string {
-  if (/['\\;⟨⟩`]/.test(raw) || raw.length > 200) throw new Error("bad node id");
-  return raw;
 }
 
 export async function loadNode(raw: string): Promise<NodeBundle | null> {
@@ -63,6 +60,9 @@ SELECT *,
 FROM ONLY type::record('thing:⟨${r}⟩') LIMIT 1;`;
   const node = await sql<NodeBundle | null>(q);
   if (!node || typeof node !== "object") return null;
-  node._docs = [...((node as ThingRow)._docs_r as [] ?? []), ...((node as ThingRow)._docs_a as [] ?? [])];
+  node._docs = [
+    ...(((node as ThingRow)._docs_r as []) ?? []),
+    ...(((node as ThingRow)._docs_a as []) ?? []),
+  ];
   return node;
 }

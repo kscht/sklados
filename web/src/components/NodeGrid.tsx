@@ -1,20 +1,16 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import type { GridChild } from "@/lib/node";
 import {
   createFolderFrom, listDesktops, moveIntoFolder, placeInto, removePlacements, setSlots,
 } from "@/lib/actions";
 
-// Грид иконок-узлов, v2 (D-53 + D-55):
-// - режим просмотра: клики только навигация, dnd ВЫКЛЮЧЕН (защита от случайного тача);
-// - «Изменить» → режим редактирования: разреженная сетка со слотами, пустые места
-//   легитимны, авто-уплотнения нет — сортировкой рулит пользователь;
-// - мультивыделение: клик = toggle, shift-клик = диапазон; действия над выделением;
-// - dnd: на пустую ячейку = перенос выделения; удержание над иконкой 0.7с = папка
-//   (или перенос в существующую папку).
+// Грид иконок-узлов (D-53 + D-55):
+// - просмотр: dnd выключен (защита от случайного тача), клик = переход;
+// - «Изменить»: разреженная сетка со слотами, пустые места легитимны,
+//   авто-уплотнения нет; мультивыделение (клик/shift); dnd выделения;
+//   удержание над иконкой 0.7с = папка / перенос в папку.
 
 const KIND_ICON: Record<string, string> = {
   location: "📦", item: "🔧", device: "💻", person: "👤", group: "👥",
@@ -51,7 +47,7 @@ export default function NodeGrid({
   editable: boolean;
   cols?: number;
 }) {
-  const router = useRouter();
+  const qc = useQueryClient();
   const [edit, setEdit] = useState(false);
   const [sel, setSel] = useState<Set<string>>(new Set());
   const [lastClick, setLastClick] = useState<string | null>(null);
@@ -63,7 +59,6 @@ export default function NodeGrid({
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [busy, setBusy] = useState(false);
 
-  // раскладка по слотам: слот из данных, узлы без слота — в свободные по порядку
   const cells: Cell[] = useMemo(() => {
     const taken = new Map<number, GridChild>();
     const noSlot: GridChild[] = [];
@@ -76,15 +71,14 @@ export default function NodeGrid({
     for (const c of noSlot) { while (taken.has(free)) free++; taken.set(free, c); }
     const maxSlot = Math.max(0, ...taken.keys());
     const rows = Math.ceil(Math.max(maxSlot, 1) / cols) + (edit ? 1 : 0);
-    const total = rows * cols;
-    return Array.from({ length: total }, (_, i) => ({ slot: i + 1, child: taken.get(i + 1) ?? null }));
+    return Array.from({ length: rows * cols }, (_, i) => ({ slot: i + 1, child: taken.get(i + 1) ?? null }));
   }, [items, cols, edit]);
 
   const occupied = useMemo(
     () => cells.filter((c): c is Cell & { child: GridChild } => !!c.child), [cells],
   );
 
-  const doneOp = () => { setDragging(false); setOverSlot(null); setFolderHint(null); setBusy(false); router.refresh(); };
+  const doneOp = () => { setDragging(false); setOverSlot(null); setFolderHint(null); setBusy(false); qc.invalidateQueries(); };
   const selIds = () =>
     occupied.filter((c) => sel.has(String(c.child.id))).map((c) => String(c.child.id));
 
@@ -105,7 +99,6 @@ export default function NodeGrid({
     setLastClick(id);
   };
 
-  // перенос выделения: первый — в целевой слот, остальные — в свободные дальше
   const dropToSlot = async (targetSlot: number) => {
     const ids = selIds();
     if (!ids.length || busy) return;
@@ -133,8 +126,6 @@ export default function NodeGrid({
       }
       doneOp();
     } else {
-      // быстрый дроп на занятую ячейку — переносим в её слот (цель не трогаем? нет:
-      // предсказуемо ставим выделение начиная со слота цели, цель уедет в keep-набор)
       const cell = occupied.find((c) => String(c.child.id) === String(target.id));
       if (cell) await dropToSlot(cell.slot);
     }
@@ -230,7 +221,7 @@ export default function NodeGrid({
               {tile}
             </div>
           ) : (
-            <Link key={id} href={nodeHref(child.id)} className={cls}>{tile}</Link>
+            <Link key={id} to={nodeHref(child.id)} className={cls}>{tile}</Link>
           );
         })}
       </div>

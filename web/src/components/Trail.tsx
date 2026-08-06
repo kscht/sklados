@@ -1,11 +1,7 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-// Breadcrumb-трейл (этап A2): путь, которым пришёл пользователь.
-// У узла графа много родителей — «правильного» пути нет, поэтому трейл
-// хранит фактическую навигацию (sessionStorage), / сбрасывает.
+// Breadcrumb-трейл: фактический путь навигации (sessionStorage), / сбрасывает.
 
 type Crumb = { id: string; name: string };
 const KEY = "domovoy_trail";
@@ -20,7 +16,7 @@ export default function Trail({ id, name }: { id: string; name: string }) {
 
   useEffect(() => {
     let t: Crumb[] = [];
-    try { t = JSON.parse(sessionStorage.getItem(KEY) ?? "[]"); } catch {}
+    try { t = JSON.parse(sessionStorage.getItem(KEY) ?? "[]"); } catch { /* пусто */ }
     const i = t.findIndex((c) => c.id === id);
     if (i >= 0) t = t.slice(0, i + 1);
     else t = [...t, { id, name }].slice(-8);
@@ -30,7 +26,7 @@ export default function Trail({ id, name }: { id: string; name: string }) {
 
   return (
     <nav className="mb-6 flex flex-wrap items-center gap-1 text-sm text-neutral-400">
-      <Link href="/" className="hover:underline" onClick={() => sessionStorage.removeItem(KEY)}>
+      <Link to="/" className="hover:underline" onClick={() => sessionStorage.removeItem(KEY)}>
         🏠 Домовой
       </Link>
       {trail.map((c, i) => (
@@ -39,7 +35,7 @@ export default function Trail({ id, name }: { id: string; name: string }) {
           {i === trail.length - 1 ? (
             <span className="text-neutral-600">{c.name}</span>
           ) : (
-            <Link href={`/n/${encodeURIComponent(c.id)}`} className="hover:underline">{c.name}</Link>
+            <Link to={`/n/${encodeURIComponent(c.id)}`} className="hover:underline">{c.name}</Link>
           )}
         </span>
       ))}

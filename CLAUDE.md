@@ -29,7 +29,7 @@ Self-hosted граф-система управления жизнью семьи
 | Слой | Технология |
 |------|-----------|
 | БД | SurrealDB (RocksDB в prod, memory в тестах) |
-| Web | Next.js 15, TypeScript, Tailwind, shadcn/ui, TanStack Query |
+| Web | Vite + React 19 SPA (D-56), TypeScript, Tailwind 4, TanStack Query; прод — статика за nginx + `/db`-прокси к SurrealDB; до Keycloak сайт закрыт basic auth |
 | TS-воркеры | Node.js 22 — scheduler, playbook, bot |
 | Python-воркеры | Python 3.12 — AI (BGE-M3, Reranker, Whisper), Files (pypdf, tesseract) |
 | Storage | MinIO (S3-совместимый) |
@@ -82,7 +82,7 @@ domovoy/
 - [x] Makefile с командами
 - [x] `scripts/seed.surql` — **мигрирован на канон 41 kind** (фаза 1): ASCII-слаги, статусы-слаги, SKOS-словари в начале файла; категории проставлены из таблицы миграции, словарь ~45 концептов с иерархией (`legacy_kind` удалён — D-33 пересмотрен)
 - [x] Surrealist GUI контейнер (`docker/surrealist/`, profile: tools) — см. проблему ниже
-- [x] `web/` — Next.js 15 инициализирован (фаза 2 v1): маршрут `/w/[slug]` рендерит workspace-узлы из графа, generic-фолбэк `/things`; деплой на VM, снаружи — https://v1.spiridus.ru/w/sklad
+- [x] `web/` — Vite + React SPA (D-56, мигрировано с Next): единая концепция «узел — экран» (D-53), рабочий стол со слотами (D-55), карточки из каталога; прод — nginx-статика + /db-прокси; снаружи — https://v1.spiridus.ru (basic auth до Keycloak)
 - [ ] `worker-scheduler/` — минимальный воркер
 - [ ] DEFINE-схема в SurrealDB (из database.md выжать в .surql файл)
 - [ ] UI-спайки (спайк A: thing list + detail, спайк B: граф-визуализация)

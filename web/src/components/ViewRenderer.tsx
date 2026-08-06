@@ -1,21 +1,10 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { sql } from "@/lib/db";
 import { cell, i18nLabel, type ThingRow } from "@/lib/format";
 import { nodeHref } from "@/components/widgets/registry";
 
-function Cell({ col, row }: { col: string; row: ThingRow }) {
-  const v = row[col];
-  if (col === "name" && row.id) {
-    return <Link href={nodeHref(row.id)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
-  }
-  if (typeof v === "string" && v.startsWith("thing:")) {
-    return <Link href={nodeHref(v)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
-  }
-  return <>{cell(v)}</>;
-}
-
-// v1-рендерер view-узлов: smart_list (+group_by), tree (упрощённый), фолбэк.
-// Полные виджеты по контрактам — фаза 3 (D-45).
+// Рендерер query-view (smart_list / tree) — клиентские запросы через TanStack Query.
 
 const ROW_LIMIT = 300;
 
@@ -24,6 +13,17 @@ function pickColumns(rows: ThingRow[]): string[] {
   const present = new Set(rows.flatMap((r) => Object.keys(r)));
   const cols = preferred.filter((c) => present.has(c));
   return cols.length ? cols : [...present].filter((c) => !c.startsWith("_") && c !== "id").slice(0, 6);
+}
+
+function Cell({ col, row }: { col: string; row: ThingRow }) {
+  const v = row[col];
+  if (col === "name" && row.id) {
+    return <Link to={nodeHref(row.id)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
+  }
+  if (typeof v === "string" && v.startsWith("thing:")) {
+    return <Link to={nodeHref(v)} className="text-blue-700 hover:underline">{cell(v)}</Link>;
+  }
+  return <>{cell(v)}</>;
 }
 
 function Table({ rows }: { rows: ThingRow[] }) {
@@ -51,10 +51,77 @@ function Table({ rows }: { rows: ThingRow[] }) {
       </table>
       {rows.length > ROW_LIMIT && (
         <p className="text-xs text-neutral-400 py-2">
-          показано {ROW_LIMIT} из {rows.length} — пагинация в фазе 4
+          показано {ROW_LIMIT} из {rows.length} — пагинация в этапе B
         </p>
       )}
     </div>
+  );
+}
+
+type LocNode = { id: string; name: string; parents: string[]; items: number };
+
+function TreeView() {
+  const { data: locs = [] } = useQuery({
+    queryKey: ["tree-locations"],
+    queryFn: () => sql<LocNode[]>(
+      `SELECT id, name, ->part_of->thing AS parents, count(->contains->thing) AS items
+       FROM thing WHERE kind = 'location';`,
+    ),
+  });
+  const byParent = new Map<string, LocNode[]>();
+  const ids = new Set(locs.map((l) => String(l.id)));
+  for (const l of locs) {
+    const p = (l.parents ?? []).map(String).find((x) => ids.has(x)) ?? "";
+    byParent.set(p, [...(byParent.get(p) ?? []), l]);
+  }
+  const render = (parent: string, depth: number): React.ReactNode =>
+    (byParent.get(parent) ?? []).map((l) => (
+      <div key={String(l.id)} style={{ marginLeft: depth * 16 }}>
+        <div className="py-1 text-sm flex items-baseline gap-2">
+          <span>{depth === 0 ? "🏠" : "▸"}</span>
+          <Link to={nodeHref(l.id)} className="hover:underline">{l.name}</Link>
+          {l.items > 0 && <span className="text-xs text-neutral-400">{l.items} шт</span>}
+        </div>
+        {render(String(l.id), depth + 1)}
+      </div>
+    ));
+  return <div>{render("", 0)}</div>;
+}
+
+export default function ViewRenderer({ view }: { view: ThingRow }) {
+  const subtype = view.subtype as string;
+  const query = typeof view.query === "string" ? view.query : null;
+  const { data: rows = [], isLoading } = useQuery({
+    queryKey: ["view-query", String(view.id)],
+    queryFn: () => sql<ThingRow[]>(query as string),
+    enabled: subtype === "smart_list" && !!query,
+  });
+
+  if (subtype === "smart_list" && query) {
+    const groupBy = view.group_by as string | undefined;
+    return (
+      <section>
+        <h2 className="text-lg font-semibold mb-4">{i18nLabel(view)}</h2>
+        {isLoading ? <p className="text-neutral-400 py-8 text-center">Загрузка…</p> : null}
+        {groupBy ? <GroupedTable rows={rows} by={groupBy} /> : <Table rows={rows} />}
+      </section>
+    );
+  }
+
+  if (subtype === "tree") {
+    return (
+      <section>
+        <h2 className="text-lg font-semibold mb-4">{i18nLabel(view)}</h2>
+        <TreeView />
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <h2 className="text-lg font-semibold mb-2">{i18nLabel(view)}</h2>
+      <p className="text-sm text-neutral-500">Нет рендерера для subtype=«{subtype}».</p>
+    </section>
   );
 }
 
@@ -76,76 +143,5 @@ function GroupedTable({ rows, by }: { rows: ThingRow[]; by: string }) {
         </details>
       ))}
     </div>
-  );
-}
-
-type LocNode = { id: string; name: string; parents: string[]; items: number };
-
-async function TreeView() {
-  const locs = await sql<LocNode[]>(
-    `SELECT id, name, ->part_of->thing AS parents, count(->contains->thing) AS items
-     FROM thing WHERE kind = 'location';`,
-  );
-  const byParent = new Map<string, LocNode[]>();
-  const ids = new Set(locs.map((l) => String(l.id)));
-  for (const l of locs) {
-    const p = (l.parents ?? []).map(String).find((x) => ids.has(x)) ?? "";
-    byParent.set(p, [...(byParent.get(p) ?? []), l]);
-  }
-  const render = (parent: string, depth: number): React.ReactNode =>
-    (byParent.get(parent) ?? []).map((l) => (
-      <div key={String(l.id)} style={{ marginLeft: depth * 16 }}>
-        <div className="py-1 text-sm flex items-baseline gap-2">
-          <span>{depth === 0 ? "🏠" : "▸"}</span>
-          <Link href={nodeHref(l.id)} className="hover:underline">{l.name}</Link>
-          {l.items > 0 && <span className="text-xs text-neutral-400">{l.items} шт</span>}
-        </div>
-        {render(String(l.id), depth + 1)}
-      </div>
-    ));
-  return (
-    <div>
-      {render("", 0)}
-      <p className="text-xs text-neutral-400 pt-4">
-        v1: только иерархия локаций; item-контейнеры, drag-n-drop — фаза 6
-      </p>
-    </div>
-  );
-}
-
-export default async function ViewRenderer({ view }: { view: ThingRow }) {
-  const subtype = view.subtype as string;
-
-  if (subtype === "smart_list" && typeof view.query === "string") {
-    const rows = await sql<ThingRow[]>(view.query);
-    const groupBy = view.group_by as string | undefined;
-    return (
-      <section>
-        <h2 className="text-lg font-semibold mb-4">{i18nLabel(view)}</h2>
-        {groupBy ? <GroupedTable rows={rows} by={groupBy} /> : <Table rows={rows} />}
-      </section>
-    );
-  }
-
-  if (subtype === "tree") {
-    return (
-      <section>
-        <h2 className="text-lg font-semibold mb-4">{i18nLabel(view)}</h2>
-        <TreeView />
-      </section>
-    );
-  }
-
-  // generic-фолбэк: незнакомый subtype (лестница D-44, ступень 5)
-  return (
-    <section>
-      <h2 className="text-lg font-semibold mb-2">{i18nLabel(view)}</h2>
-      <p className="text-sm text-neutral-500">
-        Нет рендерера для subtype=«{subtype}» — generic-фолбэк.
-      </p>
-      <pre className="mt-4 text-xs bg-neutral-50 p-3 rounded overflow-x-auto">
-        {JSON.stringify(view, null, 2)}
-      </pre>
-    </section>
   );
 }

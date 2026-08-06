@@ -1,10 +1,8 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { renameNode } from "@/lib/actions";
 
 export default function RenameButton({ id, name }: { id: string; name: string }) {
-  const router = useRouter();
+  const qc = useQueryClient();
   return (
     <button
       title="Переименовать"
@@ -13,7 +11,7 @@ export default function RenameButton({ id, name }: { id: string; name: string })
         const next = window.prompt("Название:", name);
         if (next && next !== name) {
           await renameNode(id, next);
-          router.refresh();
+          qc.invalidateQueries();
         }
       }}
     >

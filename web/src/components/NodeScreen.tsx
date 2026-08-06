@@ -6,8 +6,6 @@ import { gridChildren, rawId, type NodeBundle } from "@/lib/node";
 import type { ThingRow } from "@/lib/format";
 
 // Единая концепция (D-53): каждый узел — экран, «всё — один большой склад».
-// Шапка узла → содержимое гридом иконок → остальные свойства.
-// На desktop-узлах грид редактируемый: dnd-порядок, папки, «убрать отсюда».
 
 export default function NodeScreen({ node }: { node: NodeBundle }) {
   const isQueryView =

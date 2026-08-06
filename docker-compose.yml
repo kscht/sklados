@@ -49,26 +49,24 @@ services:
         echo 'MinIO ready'
       "
 
-  # ── Web (Next.js) ───────────────────────────────────────────────────────────
+  # ── Web (Vite + React SPA за nginx, D-56) ──────────────────────────────────
+  # Статика + /db-прокси к SurrealDB (Authorization инжектится в nginx).
+  # Basic auth на весь сайт — временно, до Keycloak (этап F, D-11).
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     restart: unless-stopped
-    volumes:
-      - ./web:/app
-      - /app/node_modules
-      - /app/.next
     ports:
-      - "${LOCAL_IP:-127.1.0.1}:${WEB_PORT:-3000}:3000"
-    env_file: .env
+      - "${LOCAL_IP:-127.1.0.1}:${WEB_PORT:-3000}:80"
     environment:
-      SURREAL_URL: ws://surrealdb:8000/rpc
+      SURREAL_USER: ${SURREAL_USER}
+      SURREAL_PASS: ${SURREAL_PASS}
+      WEB_BASIC_USER: ${WEB_BASIC_USER:-domovoy}
+      WEB_BASIC_PASS: ${WEB_BASIC_PASS:-}
     depends_on:
       surrealdb:
         condition: service_healthy
-      minio-init:
-        condition: service_completed_successfully
 
   # ── Worker: scheduler (TypeScript) ─────────────────────────────────────────
   # Периодические задачи, cron, counter-триггеры

@@ -1,9 +1,8 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import type { NodeBundle } from "@/lib/node";
 import { rawId } from "@/lib/node";
 
 // Реестр виджетов (этап A): slug → компонент + контракт.
-// Контракт-фрагменты данных живут в lib/node.ts (один SELECT, D-45).
 // Правило D-49: виджет без данных возвращает null — движок его схлопывает.
 
 export function nodeHref(id: unknown): string {
@@ -67,7 +66,7 @@ const LocationCrumb: W = ({ node }) =>
       {node._located_in.map((l, i) => (
         <span key={String(l.id)}>
           {i > 0 && " · "}
-          <Link href={nodeHref(l.id)} className="text-blue-700 hover:underline">{l.name}</Link>
+          <Link to={nodeHref(l.id)} className="text-blue-700 hover:underline">{l.name}</Link>
         </span>
       ))}
     </div>
@@ -80,7 +79,7 @@ const ContainedItems: W = ({ node }) =>
       <ul className="space-y-1">
         {node._contains.map((c) => (
           <li key={String(c.id)} className="text-sm flex items-center gap-2">
-            <Link href={nodeHref(c.id)} className="text-blue-700 hover:underline">{c.name}</Link>
+            <Link to={nodeHref(c.id)} className="text-blue-700 hover:underline">{c.name}</Link>
             {c.installed && <span className={`${chip} bg-emerald-100 text-emerald-800`}>установлено</span>}
             {c.category && <span className="text-xs text-neutral-400">{c.category}</span>}
           </li>
@@ -94,7 +93,7 @@ const LentToCard: W = ({ node }) =>
     <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
       {node._lent.map((l) => (
         <p key={String(l.id)} className="text-sm text-amber-900">
-          Одолжено: <Link href={nodeHref(l.id)} className="font-medium hover:underline">{l.name}</Link>
+          Одолжено: <Link to={nodeHref(l.id)} className="font-medium hover:underline">{l.name}</Link>
           {l.since && <span className="text-amber-700"> · с {String(l.since).slice(0, 10)}</span>}
         </p>
       ))}
@@ -108,7 +107,7 @@ const RepresentsDocs: W = ({ node }) =>
       <ul className="space-y-1">
         {node._docs.map((d) => (
           <li key={String(d.id)}>
-            <Link href={nodeHref(d.id)} className="text-sm text-blue-700 hover:underline">📄 {d.name}</Link>
+            <Link to={nodeHref(d.id)} className="text-sm text-blue-700 hover:underline">📄 {d.name}</Link>
           </li>
         ))}
       </ul>
@@ -128,9 +127,8 @@ const Timestamps: W = ({ node }) =>
     <span className="text-xs text-neutral-400">создано {String(node.created_at).slice(0, 10)}</span>
   ) : null;
 
-// generic-хвост (ступень 5): скалярные поля, не покрытые виджетами
 const HIDDEN = new Set(["id", "kind", "name", "description", "notes", "status", "category", "brand",
-  "role", "quantity", "unit", "wikidata", "created_at", "ui", "_i18n", "subtype", "icon"]);
+  "role", "quantity", "unit", "wikidata", "created_at", "ui", "_i18n", "subtype", "icon", "grid_cols", "slug"]);
 const GenericFields: W = ({ node }) => {
   const rest = Object.entries(node).filter(
     ([k, v]) => !k.startsWith("_") && !HIDDEN.has(k) && v != null && typeof v !== "object",

@@ -1,11 +1,9 @@
 import type { NodeBundle } from "@/lib/node";
 import { REGISTRY } from "@/components/widgets/registry";
 
-// Универсальная карточка узла (этап A).
-// Лестница D-44 (v1): ui с концепта kind (ступень 3) → generic-фолбэк (ступень 5).
-// Правила движка: пустой виджет схлопывается; незнакомый слаг → бейдж, не падение.
-// sections/hide — для единого экрана узла (NodeScreen): шапка и тело рендерятся
-// вокруг грида содержимого.
+// Универсальная карточка узла: раскладка из ui концепта kind (лестница D-44,
+// ступень 3) с generic-фолбэком (ступень 5). Пустой виджет схлопывается;
+// незнакомый слаг → бейдж, не падение.
 
 const FALLBACK_LAYOUT: Record<string, string[]> = {
   header: ["Title", "StatusChip", "CategoryChip"],
