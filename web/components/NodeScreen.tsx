@@ -24,8 +24,13 @@ export default function NodeScreen({ node }: { node: NodeBundle }) {
         <NodeCard node={node} sections={["header"]} />
         {editable && <RenameButton id={rawId(String(node.id))} name={String(node.name ?? "")} />}
       </div>
-      {children.length > 0 && (
-        <NodeGrid items={children} containerId={String(node.id)} editable={editable} />
+      {(children.length > 0 || editable) && (
+        <NodeGrid
+          items={children}
+          containerId={String(node.id)}
+          editable={editable}
+          cols={typeof node.grid_cols === "number" ? node.grid_cols : 8}
+        />
       )}
       <NodeCard node={node} sections={["body", "footer"]} hide={hide} />
     </div>

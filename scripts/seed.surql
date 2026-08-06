@@ -3040,3 +3040,7 @@ RELATE thing:`folder_tech`->references->thing:`nuc_intel_i5_mini_pc` SET order =
 RELATE thing:`folder_tech`->references->thing:`роутер_tp_link_ax3000` SET order = 2;
 RELATE thing:`folder_tech`->references->thing:`ноутбук_thinkpad_t14s` SET order = 3;
 RELATE thing:`folder_tech`->references->thing:`kindle_paperwhite_11` SET order = 4;
+
+-- ═══ Desktop v2 (D-55): слоты вместо потока, ширина сетки ══════════════════
+UPDATE thing SET grid_cols = 8 WHERE kind = 'view' AND subtype = 'desktop';
+UPDATE references SET slot = order WHERE in.kind = 'view' AND in.subtype = 'desktop' AND slot = NONE;

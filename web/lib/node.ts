@@ -8,6 +8,7 @@ import type { ThingRow } from "@/lib/format";
 export type GridChild = {
   id: string; name?: string; kind?: string; subtype?: string;
   icon?: string; category?: string; label?: string; installed?: boolean;
+  slot?: number | null;
 };
 
 export type NodeBundle = ThingRow & {
@@ -57,7 +58,7 @@ SELECT *,
  (SELECT since, out.id AS id, out.name AS name FROM lent_to WHERE in = $parent.id) AS _lent,
  (SELECT in.id AS id, in.name AS name FROM represents WHERE out = $parent.id) AS _docs_r,
  (SELECT in.id AS id, in.name AS name FROM about WHERE out = $parent.id AND in.kind = 'document') AS _docs_a,
- (SELECT order, out.id AS id, out.name AS name, out.kind AS kind, out.subtype AS subtype, out.icon AS icon, out.category AS category, out._i18n.ru.label AS label FROM references WHERE in = $parent.id ORDER BY order LIMIT 200) AS _placed,
+ (SELECT order, slot, out.id AS id, out.name AS name, out.kind AS kind, out.subtype AS subtype, out.icon AS icon, out.category AS category, out._i18n.ru.label AS label FROM references WHERE in = $parent.id ORDER BY slot, order LIMIT 200) AS _placed,
  (SELECT in.id AS id, in.name AS name, in.kind AS kind, in.icon AS icon FROM part_of WHERE out = $parent.id AND in.kind = 'location' LIMIT 200) AS _sub_locations
 FROM ONLY type::record('thing:⟨${r}⟩') LIMIT 1;`;
   const node = await sql<NodeBundle | null>(q);
